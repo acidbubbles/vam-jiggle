@@ -62,7 +62,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Jiggle.cs" />
+    <Compile Include="src/Jiggle.cs" />
+    <Compile Include="src/DynamicBone.cs" />
+    <Compile Include="src/DynamicBoneCollider.cs" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
