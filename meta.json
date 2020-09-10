@@ -1,15 +1,15 @@
 { 
    "licenseType" : "CC BY-SA", 
-   "creatorName" : "Author", 
-   "packageName" : "MyPlugin", 
+   "creatorName" : "Acidbubbles", 
+   "packageName" : "Jiggle", 
    "includeVersionsInReferences" : "true", 
-   "description" : "v0.0.0 MyPlugin Description", 
+   "description" : "v0.0.0 A script to add jiggle to custom Unity asset bones in Virt-A-Mate.", 
    "credits" : "", 
    "instructions" : "", 
-   "promotionalLink" : "https://github.com/Author/MyPlugin", 
+   "promotionalLink" : "https://github.com/acidbubbles/vam-jiggle", 
    "programVersion" : "1.19.0.5", 
    "contentList" : [ 
-      "Custom\\Scripts\\Author\\MyPlugin\\MyPlugin.cs"
+      "Custom\\Scripts\\Acidbubbles\\Jiggle\\Jiggle.cs"
    ], 
    "dependencies" : { 
    }
