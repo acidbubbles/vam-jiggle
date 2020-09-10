@@ -1,25 +1,26 @@
 ﻿using UnityEngine;
 
 
-[AddComponentMenu("Dynamic Bone/Dynamic Bone Collider")]
 public class DynamicBoneCollider : MonoBehaviour
 {
     public Vector3 m_Center = Vector3.zero;
     public float m_Radius = 0.5f;
     public float m_Height = 0;
 
-    public enum Direction
+    public static class Direction
     {
-        X, Y, Z
+        public const int X = 0;
+        public const int Y = 1;
+        public const int Z = 2;
     }
-    public Direction m_Direction = Direction.X;
+    public int /*Direction*/ m_Direction = Direction.X;
 
-    public enum Bound
+    public static class Bound
     {
-        Outside,
-        Inside
+        public const int Outside = 0;
+        public const int Inside = 1;
     }
-    public Bound m_Bound = Bound.Outside;
+    public int /*Bound*/ m_Bound = Bound.Outside;
 
     void OnValidate()
     {

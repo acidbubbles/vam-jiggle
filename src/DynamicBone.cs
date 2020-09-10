@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-[AddComponentMenu("Dynamic Bone/Dynamic Bone")]
 public class DynamicBone : MonoBehaviour
 {
     public Transform m_Root = null;
@@ -27,11 +26,14 @@ public class DynamicBone : MonoBehaviour
     public Vector3 m_Force = Vector3.zero;
     public List<DynamicBoneCollider> m_Colliders = null;
     public List<Transform> m_Exclusions = null;
-    public enum FreezeAxis
+    public static class FreezeAxis
     {
-        None, X, Y, Z
+        public const int None = 0;
+        public const int X = 1;
+        public const int Y = 2;
+        public const int Z = 3;
     }
-    public FreezeAxis m_FreezeAxis = FreezeAxis.None;
+    public int /*FreezeAxis*/ m_FreezeAxis = FreezeAxis.None;
     public bool m_DistantDisable = false;
     public Transform m_ReferenceObject = null;
     public float m_DistanceToObject = 20;
@@ -436,7 +438,7 @@ public class DynamicBone : MonoBehaviour
                 }
             }
 
-            // freeze axis, project to plane 
+            // freeze axis, project to plane
             if (m_FreezeAxis != FreezeAxis.None)
             {
                 switch (m_FreezeAxis)
