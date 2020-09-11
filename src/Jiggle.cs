@@ -10,6 +10,14 @@ public class Jiggle : MVRScript
     private DynamicBone _dynamicBone;
     private JSONStorableStringChooser _rootJSON;
     private CustomUnityAssetLoader _loader;
+    private JSONStorableFloat _updateRateJSON;
+    private JSONStorableFloat _dampingJSON;
+    private JSONStorableFloat _elasticityJSON;
+    private JSONStorableFloat _inertJSON;
+    private JSONStorableFloat _radiusJSON;
+    private JSONStorableFloat _endLengthJSON;
+
+    public JSONStorableFloat _stiffnessJSON { get; private set; }
 
     public override void Init()
     {
@@ -19,12 +27,38 @@ public class Jiggle : MVRScript
             _loader = containingAtom.GetComponentInChildren<CustomUnityAssetLoader>();
             if (_loader == null) throw new InvalidOperationException($"Atom does not have a {nameof(CustomUnityAssetLoader)}");
 
-            CreateButton("Apply", false).button.onClick.AddListener(() => Apply());
-
             _rootJSON = new JSONStorableStringChooser("Root", new List<string>(), "", "Root", (string _) => Apply());
             RegisterStringChooser(_rootJSON);
-            var rootPopup = CreateFilterablePopup(_rootJSON, true);
+            var rootPopup = CreateFilterablePopup(_rootJSON, false);
             rootPopup.popup.onOpenPopupHandlers += SyncRoot;
+
+            _updateRateJSON = new JSONStorableFloat("Update rate", 60f, (float _) => Apply(), 1f, 120f, false);
+            RegisterFloat(_updateRateJSON);
+            CreateSlider(_updateRateJSON, false);
+
+            _dampingJSON = new JSONStorableFloat("Damping", 0.1f, (float _) => Apply(), 0f, 1f, true);
+            RegisterFloat(_dampingJSON);
+            CreateSlider(_dampingJSON, false);
+
+            _elasticityJSON = new JSONStorableFloat("Elasticity", 0.1f, (float _) => Apply(), 0f, 1f, true);
+            RegisterFloat(_elasticityJSON);
+            CreateSlider(_elasticityJSON, false);
+
+            _stiffnessJSON = new JSONStorableFloat("Stiffness", 0.1f, (float _) => Apply(), 0f, 1f, true);
+            RegisterFloat(_stiffnessJSON);
+            CreateSlider(_stiffnessJSON, false);
+
+            _inertJSON = new JSONStorableFloat("Inert", 0f, (float _) => Apply(), 0f, 1f, true);
+            RegisterFloat(_inertJSON);
+            CreateSlider(_inertJSON, false);
+
+            _radiusJSON = new JSONStorableFloat("Radius", 0f, (float _) => Apply(), 0f, 1f, false);
+            RegisterFloat(_radiusJSON);
+            CreateSlider(_radiusJSON, false);
+
+            _endLengthJSON = new JSONStorableFloat("End length", 0f, (float _) => Apply(), 0f, 1f, false);
+            RegisterFloat(_endLengthJSON);
+            CreateSlider(_endLengthJSON, false);
 
             SyncRoot();
 
@@ -56,6 +90,13 @@ public class Jiggle : MVRScript
         if (root == null) return;
         _dynamicBone = _cua.gameObject.AddComponent<DynamicBone>();
         _dynamicBone.m_Root = root;
+        _dynamicBone.m_UpdateRate = _updateRateJSON.val;
+        _dynamicBone.m_Damping = _dampingJSON.val;
+        _dynamicBone.m_Elasticity = _elasticityJSON.val;
+        _dynamicBone.m_Stiffness = _stiffnessJSON.val;
+        _dynamicBone.m_Radius = _radiusJSON.val;
+        _dynamicBone.m_Inert = _inertJSON.val;
+        _dynamicBone.m_EndLength = _endLengthJSON.val;
     }
 
     private void SyncRoot()
