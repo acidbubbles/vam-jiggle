@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,23 +9,26 @@ public class Jiggle : MVRScript
     private Transform _cua;
     private DynamicBone _dynamicBone;
     private JSONStorableStringChooser _rootJSON;
+    private CustomUnityAssetLoader _loader;
 
     public override void Init()
     {
         try
         {
             var containingAtom = GetAtom();
-            var loader = containingAtom.GetComponentInChildren<CustomUnityAssetLoader>();
-            if (loader == null) throw new InvalidOperationException($"Atom does not have a {nameof(CustomUnityAssetLoader)}");
-            if (loader.transform.childCount == 0) throw new InvalidOperationException($"No unity asset has been loaded");
-            _cua = loader.transform.GetChild(0);
+            _loader = containingAtom.GetComponentInChildren<CustomUnityAssetLoader>();
+            if (_loader == null) throw new InvalidOperationException($"Atom does not have a {nameof(CustomUnityAssetLoader)}");
 
-            _rootJSON = new JSONStorableStringChooser("Root", new List<string>(), "", "Root", SelectRoot);
+            CreateButton("Apply", false).button.onClick.AddListener(() => Apply());
+
+            _rootJSON = new JSONStorableStringChooser("Root", new List<string>(), "", "Root", (string _) => Apply());
             RegisterStringChooser(_rootJSON);
-            var rootPopup = CreateFilterablePopup(_rootJSON, false);
+            var rootPopup = CreateFilterablePopup(_rootJSON, true);
             rootPopup.popup.onOpenPopupHandlers += SyncRoot;
 
             SyncRoot();
+
+            StartCoroutine(InitDeferred());
         }
         catch (Exception e)
         {
@@ -32,10 +36,23 @@ public class Jiggle : MVRScript
         }
     }
 
-    private void SelectRoot(string val)
+    public IEnumerator InitDeferred()
     {
+        if (string.IsNullOrEmpty(_rootJSON.val)) yield break;
+        if (string.IsNullOrEmpty(containingAtom.GetStorableByID("asset").GetStringChooserParamValue("assetName"))) yield break;
+
+        while (_loader.transform.childCount == 0)
+            yield return 0;
+
+        Apply();
+    }
+
+    private void Apply()
+    {
+        if (_loader.transform.childCount == 0) return;
+        _cua = _loader.transform.GetChild(0);
         if (_dynamicBone != null) { Destroy(_dynamicBone); _dynamicBone = null; }
-        var root = _cua.Find(val.TrimStart());
+        var root = _cua.Find(_rootJSON.val.TrimStart());
         if (root == null) return;
         _dynamicBone = _cua.gameObject.AddComponent<DynamicBone>();
         _dynamicBone.m_Root = root;
@@ -43,9 +60,13 @@ public class Jiggle : MVRScript
 
     private void SyncRoot()
     {
-        if (_cua == null || _rootJSON == null) return;
+        if (_loader.transform.childCount == 0) {
+            _rootJSON.choices = new List<string>();
+            return;
+        }
+        var cua = _loader.transform.GetChild(0);
         var potentialRoots = new List<string>();
-        GetChildren(0, _cua, potentialRoots);
+        GetChildren(0, cua, potentialRoots);
         _rootJSON.choices = potentialRoots;
     }
 
